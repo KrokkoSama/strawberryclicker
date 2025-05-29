@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mini Clicker Game</title>
+  <title>Strawberry Clicker</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f0f0f0;
+      background: #e679e0;
       text-align: center;
       padding: 50px;
     }
@@ -42,12 +42,12 @@
 <body>
 
   <h1>Strawberry Clicker</h1>
-  <div id="score">Score: 0</div>
+  <div id="score">Fraises: 0</div>
   <button id="clickButton">Cliquer !</button>
 
   <div class="upgrade">
     <h2>Améliorations</h2>
-    <button id="autoClickerBtn">Acheter Auto-Clicker (10 points)</button>
+    <button id="autoClickerBtn">Champs de fraises (10 points)</button>
   </div>
 
   <script>
@@ -65,13 +65,13 @@
       updateScore();
     });
 
-    // Acheter Auto-Clicker
+    // Champs de fraise
     autoClickerBtn.addEventListener('click', () => {
       if (score >= autoClickerPrice) {
         score -= autoClickerPrice;
         autoClickers++;
         autoClickerPrice = Math.round(autoClickerPrice * 1.5); // Augmente le prix à chaque achat
-        autoClickerBtn.textContent = `Acheter Auto-Clicker (${autoClickerPrice} points)`;
+        autoClickerBtn.textContent = `Champs de fraises (${autoClickerPrice} points)`;
         updateScore();
       }
     });
@@ -85,7 +85,7 @@
     }, 1000); // Chaque seconde
 
     function updateScore() {
-      scoreDisplay.textContent = `Score: ${score}`;
+      scoreDisplay.textContent = `Fraises: ${score}`;
     }
   </script>
 
