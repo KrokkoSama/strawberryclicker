@@ -4,89 +4,105 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Strawberry Clicker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Custom styles for background image and font */
     body {
-      font-family: Arial, sans-serif;
-      background: #e679e0;
-      text-align: center;
-      padding: 50px;
+      font-family: 'Inter', sans-serif;
+      /* Fallback background color if image fails to load */
+      background-color: #f87171;
     }
-    h1 {
-      font-size: 2.5rem;
-    }
-    #score {
-      font-size: 2rem;
-      margin: 20px 0;
-    }
-    button {
-      font-size: 1.5rem;
-      padding: 15px 30px;
-      cursor: pointer;
-      border: none;
-      border-radius: 10px;
-      background-color: #4CAF50;
-      color: white;
-      transition: background-color 0.2s;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    .upgrade {
-      margin-top: 30px;
-    }
-    .upgrade button {
-      background-color: #2196F3;
+    /* Ensure the background image covers the entire screen */
+    .bg-strawberry {
+      background-image: url("https://cdn.discordapp.com/attachments/819133172096696361/1377720565292335235/128960-shake-douceur-eau-lumiere-jus_de_fraise-3840x2400.png?ex=6839fdc3&is=6838ac43&hm=ec8c959efa0774c2710ac3aa03182f0cbef07ca4ae58da32dc6d810feb51ce69&");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
     }
   </style>
 </head>
-<body>
+<body class="bg-strawberry flex flex-col items-center justify-center min-h-screen text-white p-4">
 
-  <h1>Strawberry Clicker</h1>
-  <div id="score">Fraises: 0</div>
-  <button id="clickButton">Cliquer !</button>
+  <style>
+    .text-outline {
+      color: #919191;
+      -webkit-text-stroke: 1px white;
+      text-stroke: 2px white;
+    }
+  </style>
 
-  <div class="upgrade">
-    <h2>Améliorations</h2>
-    <button id="autoClickerBtn">Champs de fraises (10 points)</button>
+  <h1 class="text-5xl md:text-6xl font-extrabold mb-8 drop-shadow-lg text-outline">Strawberry Clicker</h1>
+
+
+  <div id="score" class="text-4xl md:text-5xl font-bold mb-8 p-4 bg-black bg-opacity-50 rounded-xl shadow-lg">
+    Fraises: 0
+  </div>
+
+  <button id="clickButton" class="text-3xl md:text-4xl px-10 py-6 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-bold rounded-full shadow-xl transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-75">
+    Cliquer !
+  </button>
+
+  <div class="upgrade mt-12 w-full max-w-md bg-black bg-opacity-50 p-6 rounded-xl shadow-xl">
+    <h2 class="text-3xl md:text-4xl font-bold mb-6">Améliorations</h2>
+    <button id="autoClickerBtn" class="w-full text-2xl md:text-3xl px-8 py-5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-full shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-75">
+      Champs de fraises (10 points)
+    </button>
   </div>
 
   <script>
+    // Initialize game variables
     let score = 0;
     let autoClickers = 0;
     let autoClickerPrice = 10;
 
+    // Get references to DOM elements
     const scoreDisplay = document.getElementById('score');
     const clickButton = document.getElementById('clickButton');
     const autoClickerBtn = document.getElementById('autoClickerBtn');
 
-    // Clique principal
-    clickButton.addEventListener('click', () => {
-      score++;
-      updateScore();
-    });
-
-    // Champs de fraise
-    autoClickerBtn.addEventListener('click', () => {
-      if (score >= autoClickerPrice) {
-        score -= autoClickerPrice;
-        autoClickers++;
-        autoClickerPrice = Math.round(autoClickerPrice * 1.5); // Augmente le prix à chaque achat
-        autoClickerBtn.textContent = `Champs de fraises (${autoClickerPrice} points)`;
-        updateScore();
-      }
-    });
-
-    // Boucle automatique (auto-clickers)
-    setInterval(() => {
-      if (autoClickers > 0) {
-        score += autoClickers;
-        updateScore();
-      }
-    }, 1000); // Chaque seconde
-
+    /**
+     * Updates the score display on the screen.
+     */
     function updateScore() {
       scoreDisplay.textContent = `Fraises: ${score}`;
     }
+
+    // Event listener for the main click button
+    clickButton.addEventListener('click', () => {
+      score++; // Increment score on click
+      updateScore(); // Update the display
+    });
+
+    // Event listener for the auto-clicker upgrade button
+    autoClickerBtn.addEventListener('click', () => {
+      // Check if the player has enough score to buy the upgrade
+      if (score >= autoClickerPrice) {
+        score -= autoClickerPrice; // Deduct price from score
+        autoClickers++; // Increase auto-clicker count
+        // Increase the price for the next auto-clicker purchase
+        autoClickerPrice = Math.round(autoClickerPrice * 1.5);
+        // Update the auto-clicker button text with the new price
+        autoClickerBtn.textContent = `Champs de fraises (${autoClickerPrice} points)`;
+        updateScore(); // Update the score display
+      } else {
+        // Optionally, provide feedback to the user if they can't afford it
+        // For simplicity, we'll just log to console here.
+        console.log("Not enough strawberries to buy this upgrade!");
+      }
+    });
+
+    // Automatic score increment loop (auto-clickers)
+    setInterval(() => {
+      // Only add score if there are active auto-clickers
+      if (autoClickers > 0) {
+        score += autoClickers; // Add score based on the number of auto-clickers
+        updateScore(); // Update the display
+      }
+    }, 1000); // Runs every 1000 milliseconds (1 second)
+
+    // Initial score update when the page loads
+    updateScore();
   </script>
 
 </body>
