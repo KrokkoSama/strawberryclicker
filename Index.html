@@ -1,1 +1,94 @@
-SS
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Clicker Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      font-size: 2.5rem;
+    }
+    #score {
+      font-size: 2rem;
+      margin: 20px 0;
+    }
+    button {
+      font-size: 1.5rem;
+      padding: 15px 30px;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      background-color: #4CAF50;
+      color: white;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .upgrade {
+      margin-top: 30px;
+    }
+    .upgrade button {
+      background-color: #2196F3;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Mon Clicker Game</h1>
+  <div id="score">Score: 0</div>
+  <button id="clickButton">Cliquer !</button>
+
+  <div class="upgrade">
+    <h2>Améliorations</h2>
+    <button id="autoClickerBtn">Acheter Auto-Clicker (10 points)</button>
+  </div>
+
+  <script>
+    let score = 0;
+    let autoClickers = 0;
+    let autoClickerPrice = 10;
+
+    const scoreDisplay = document.getElementById('score');
+    const clickButton = document.getElementById('clickButton');
+    const autoClickerBtn = document.getElementById('autoClickerBtn');
+
+    // Clique principal
+    clickButton.addEventListener('click', () => {
+      score++;
+      updateScore();
+    });
+
+    // Acheter Auto-Clicker
+    autoClickerBtn.addEventListener('click', () => {
+      if (score >= autoClickerPrice) {
+        score -= autoClickerPrice;
+        autoClickers++;
+        autoClickerPrice = Math.round(autoClickerPrice * 1.5); // Augmente le prix à chaque achat
+        autoClickerBtn.textContent = `Acheter Auto-Clicker (${autoClickerPrice} points)`;
+        updateScore();
+      }
+    });
+
+    // Boucle automatique (auto-clickers)
+    setInterval(() => {
+      if (autoClickers > 0) {
+        score += autoClickers;
+        updateScore();
+      }
+    }, 1000); // Chaque seconde
+
+    function updateScore() {
+      scoreDisplay.textContent = `Score: ${score}`;
+    }
+  </script>
+
+</body>
+</html>
+
