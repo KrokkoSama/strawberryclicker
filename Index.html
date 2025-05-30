@@ -7,102 +7,159 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Custom styles for background image and font */
     body {
       font-family: 'Inter', sans-serif;
-      /* Fallback background color if image fails to load */
       background-color: #f87171;
     }
-    /* Ensure the background image covers the entire screen */
     .bg-strawberry {
-      background-image: url("https://cdn.discordapp.com/attachments/819133172096696361/1377720565292335235/128960-shake-douceur-eau-lumiere-jus_de_fraise-3840x2400.png?ex=6839fdc3&is=6838ac43&hm=ec8c959efa0774c2710ac3aa03182f0cbef07ca4ae58da32dc6d810feb51ce69&");
+      background-image: url("https://media.discordapp.net/attachments/1273697941172912181/1377809249312444456/fraise-coupee-morceaux-fond-plat_559117-427.png?ex=683a505b&is=6838fedb&hm=2bb12f6e69db21f20b57435d8d524707e447166dc5b24475fb031619693b1f35&=&format=webp&quality=lossless&width=689&height=689");
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
     }
-  </style>
-</head>
-<body class="bg-strawberry flex flex-col items-center justify-center min-h-screen text-white p-4">
-
-  <style>
     .text-outline {
       color: #919191;
       -webkit-text-stroke: 1px white;
       text-stroke: 2px white;
     }
   </style>
+</head>
+<body class="bg-strawberry flex flex-col items-center text-white p-4 min-h-screen">
 
-  <h1 class="text-5xl md:text-6xl font-extrabold mb-8 drop-shadow-lg text-outline">Strawberry Clicker</h1>
+  <h1 class="text-5xl md:text-6xl font-extrabold mb-4 drop-shadow-lg text-outline">Strawberry Clicker</h1>
 
-
-  <div id="score" class="text-4xl md:text-5xl font-bold mb-8 p-4 bg-black bg-opacity-50 rounded-xl shadow-lg">
+  <div id="score" class="text-4xl md:text-5xl font-bold mb-4 p-4 bg-black bg-opacity-50 rounded-xl shadow-lg">
     Fraises: 0
   </div>
 
-  <button id="clickButton" class="text-3xl md:text-4xl px-10 py-6 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-bold rounded-full shadow-xl transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-75">
-    Cliquer !
+  <!-- Compteurs -->
+  <div class="text-lg md:text-xl font-semibold mb-4 p-4 bg-black bg-opacity-50 rounded-xl shadow-lg">
+    <p>🍓 Fraises par seconde : <span id="perSecond">0</span></p>
+    <p>👆 Fraises par clic : <span id="perClick">1</span></p>
+    <p>🖱️ Clics totaux : <span id="clicksTotal">0</span></p>
+    <p>📦 Fraises possédées : <span id="strawberriesOwned">0</span></p>
+  </div>
+
+  <button id="clickButton" class="text-9xl p-6 bg-green-600 hover:bg-green-700 active:bg-green-800 rounded-full shadow-xl transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-75 mb-24">
+    🍓
   </button>
 
-  <div class="upgrade mt-12 w-full max-w-md bg-black bg-opacity-50 p-6 rounded-xl shadow-xl">
-    <h2 class="text-3xl md:text-4xl font-bold mb-6">Améliorations</h2>
-    <button id="autoClickerBtn" class="w-full text-2xl md:text-3xl px-8 py-5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-full shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-75">
-      Champs de fraises (10 points)
-    </button>
+  <!-- Barre fixe des upgrades en bas -->
+  <div class="fixed bottom-0 left-0 right-0 h-64 bg-black bg-opacity-60 flex border-t-4 border-black z-50">
+    <!-- Upgrades Click à gauche -->
+    <div class="w-1/2 h-full p-4 overflow-y-auto border-r-4 border-black">
+      <h2 class="text-2xl md:text-3xl font-bold mb-4">Fraises par Clic</h2>
+      <div id="clickUpgrades" class="flex flex-col gap-4"></div>
+    </div>
+    <!-- Upgrades Auto à droite -->
+    <div class="w-1/2 h-full p-4 overflow-y-auto">
+      <h2 class="text-2xl md:text-3xl font-bold mb-4">Fraises Automatiques</h2>
+      <div id="autoUpgrades" class="flex flex-col gap-4"></div>
+    </div>
   </div>
 
   <script>
-    // Initialize game variables
     let score = 0;
-    let autoClickers = 0;
-    let autoClickerPrice = 10;
+    let clickPower = 1;
+    let totalClicks = 0;
 
-    // Get references to DOM elements
+    const autoUpgrades = [
+      { id: "autoClicker", name: "Champs de fraises", price: 10, gain: 1, count: 0 },
+      { id: "jamFactory", name: "Usine de confiture", price: 50, gain: 5, count: 0 },
+      { id: "megaFarm", name: "Ferme géante", price: 200, gain: 20, count: 0 },
+      { id: "berryLab", name: "Laboratoire de fraises", price: 500, gain: 50, count: 0 },
+      { id: "strawberryRocket", name: "Fusée à fraises", price: 1000, gain: 100, count: 0 },
+    ];
+
+    const clickUpgrades = [
+      { id: "betterClicker", name: "Gants cueilleurs", price: 25, gain: 1, count: 0 },
+      { id: "steelFingers", name: "Doigts en acier", price: 100, gain: 5, count: 0 },
+      { id: "laserPointer", name: "Laser cueilleur", price: 300, gain: 15, count: 0 },
+      { id: "robotArm", name: "Bras robotique", price: 1000, gain: 50, count: 0 },
+      { id: "quantumClicker", name: "Clicker quantique", price: 5000, gain: 200, count: 0 },
+    ];
+
     const scoreDisplay = document.getElementById('score');
-    const clickButton = document.getElementById('clickButton');
-    const autoClickerBtn = document.getElementById('autoClickerBtn');
+    const perSecondDisplay = document.getElementById('perSecond');
+    const perClickDisplay = document.getElementById('perClick');
+    const clicksTotalDisplay = document.getElementById('clicksTotal');
+    const strawberriesOwnedDisplay = document.getElementById('strawberriesOwned');
 
-    /**
-     * Updates the score display on the screen.
-     */
-    function updateScore() {
+    const clickButton = document.getElementById('clickButton');
+    const autoUpgradesContainer = document.getElementById('autoUpgrades');
+    const clickUpgradesContainer = document.getElementById('clickUpgrades');
+
+    function updateDisplays() {
       scoreDisplay.textContent = `Fraises: ${score}`;
+      perClickDisplay.textContent = clickPower;
+      clicksTotalDisplay.textContent = totalClicks;
+      strawberriesOwnedDisplay.textContent = score;
     }
 
-    // Event listener for the main click button
+    function updatePerSecond() {
+      let totalGain = 0;
+      autoUpgrades.forEach(upgrade => {
+        totalGain += upgrade.count * upgrade.gain;
+      });
+      perSecondDisplay.textContent = totalGain;
+    }
+
     clickButton.addEventListener('click', () => {
-      score++; // Increment score on click
-      updateScore(); // Update the display
+      score += clickPower;
+      totalClicks++;
+      updateDisplays();
     });
 
-    // Event listener for the auto-clicker upgrade button
-    autoClickerBtn.addEventListener('click', () => {
-      // Check if the player has enough score to buy the upgrade
-      if (score >= autoClickerPrice) {
-        score -= autoClickerPrice; // Deduct price from score
-        autoClickers++; // Increase auto-clicker count
-        // Increase the price for the next auto-clicker purchase
-        autoClickerPrice = Math.round(autoClickerPrice * 1.5);
-        // Update the auto-clicker button text with the new price
-        autoClickerBtn.textContent = `Champs de fraises (${autoClickerPrice} points)`;
-        updateScore(); // Update the score display
-      } else {
-        // Optionally, provide feedback to the user if they can't afford it
-        // For simplicity, we'll just log to console here.
-        console.log("Not enough strawberries to buy this upgrade!");
-      }
+    autoUpgrades.forEach(upgrade => {
+      const button = document.createElement('button');
+      button.id = upgrade.id + 'Btn';
+      button.textContent = `${upgrade.name} (${upgrade.price} Fraises)`;
+      button.className = "w-full text-lg md:text-xl px-4 py-3 bg-pink-600 hover:bg-pink-700 active:bg-pink-800 text-white font-bold rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-pink-500 focus:ring-opacity-75";
+      autoUpgradesContainer.appendChild(button);
+
+      button.addEventListener('click', () => {
+        if (score >= upgrade.price) {
+          score -= upgrade.price;
+          upgrade.count++;
+          upgrade.price = Math.round(upgrade.price * 1.5);
+          button.textContent = `${upgrade.name} (${upgrade.price} Fraises)`;
+          updateDisplays();
+          updatePerSecond();
+        }
+      });
     });
 
-    // Automatic score increment loop (auto-clickers)
+    clickUpgrades.forEach(upgrade => {
+      const button = document.createElement('button');
+      button.id = upgrade.id + 'Btn';
+      button.textContent = `${upgrade.name} (${upgrade.price} Fraises)`;
+      button.className = "w-full text-lg md:text-xl px-4 py-3 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-75";
+      clickUpgradesContainer.appendChild(button);
+
+      button.addEventListener('click', () => {
+        if (score >= upgrade.price) {
+          score -= upgrade.price;
+          upgrade.count++;
+          clickPower += upgrade.gain;
+          upgrade.price = Math.round(upgrade.price * 1.5);
+          button.textContent = `${upgrade.name} (${upgrade.price} Fraises)`;
+          updateDisplays();
+        }
+      });
+    });
+
     setInterval(() => {
-      // Only add score if there are active auto-clickers
-      if (autoClickers > 0) {
-        score += autoClickers; // Add score based on the number of auto-clickers
-        updateScore(); // Update the display
-      }
-    }, 1000); // Runs every 1000 milliseconds (1 second)
+      let totalGain = 0;
+      autoUpgrades.forEach(upgrade => {
+        totalGain += upgrade.count * upgrade.gain;
+      });
+      score += totalGain;
+      updateDisplays();
+      updatePerSecond();
+    }, 1000);
 
-    // Initial score update when the page loads
-    updateScore();
+    updateDisplays();
+    updatePerSecond();
   </script>
 
 </body>
