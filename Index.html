@@ -26,6 +26,11 @@
 </head>
 <body class="bg-strawberry flex flex-col items-center text-white p-4 min-h-screen">
 
+  <!-- Bouton de sauvegarde en haut à droite -->
+  <button id="saveButton" class="fixed top-4 right-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg z-50">
+    💾 Sauvegarder
+  </button>
+
   <h1 class="text-5xl md:text-6xl font-extrabold mb-4 drop-shadow-lg text-outline">Strawberry Clicker</h1>
 
   <div id="score" class="text-4xl md:text-5xl font-bold mb-4 p-4 bg-black bg-opacity-50 rounded-xl shadow-lg">
@@ -82,17 +87,15 @@
     const perSecondDisplay = document.getElementById('perSecond');
     const perClickDisplay = document.getElementById('perClick');
     const clicksTotalDisplay = document.getElementById('clicksTotal');
-    const strawberriesOwnedDisplay = document.getElementById('strawberriesOwned');
-
     const clickButton = document.getElementById('clickButton');
     const autoUpgradesContainer = document.getElementById('autoUpgrades');
     const clickUpgradesContainer = document.getElementById('clickUpgrades');
+    const saveButton = document.getElementById('saveButton');
 
     function updateDisplays() {
       scoreDisplay.textContent = `Fraises: ${score}`;
       perClickDisplay.textContent = clickPower;
       clicksTotalDisplay.textContent = totalClicks;
-      strawberriesOwnedDisplay.textContent = score;
     }
 
     function updatePerSecond() {
@@ -156,6 +159,43 @@
       updateDisplays();
       updatePerSecond();
     }, 1000);
+
+    // Sauvegarde des données
+    saveButton.addEventListener('click', () => {
+      const saveData = {
+        score,
+        clickPower,
+        totalClicks,
+        autoUpgrades,
+        clickUpgrades
+      };
+      localStorage.setItem('strawberrySave', JSON.stringify(saveData));
+      alert('Sauvegarde effectuée ! 🍓');
+    });
+
+    // Charger les données si elles existent
+    window.addEventListener('load', () => {
+      const saved = localStorage.getItem('strawberrySave');
+      if (saved) {
+        const data = JSON.parse(saved);
+        score = data.score;
+        clickPower = data.clickPower;
+        totalClicks = data.totalClicks;
+
+        data.autoUpgrades.forEach((savedUpgrade, i) => {
+          autoUpgrades[i].count = savedUpgrade.count;
+          autoUpgrades[i].price = savedUpgrade.price;
+        });
+
+        data.clickUpgrades.forEach((savedUpgrade, i) => {
+          clickUpgrades[i].count = savedUpgrade.count;
+          clickUpgrades[i].price = savedUpgrade.price;
+        });
+
+        updateDisplays();
+        updatePerSecond();
+      }
+    });
 
     updateDisplays();
     updatePerSecond();
